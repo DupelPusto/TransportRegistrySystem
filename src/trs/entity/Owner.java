@@ -23,6 +23,6 @@ public class Owner {
     }
 
     public String getFullName(){
-        return this.name + this.surname;
+        return this.name + " " + this.surname;
     }
 }
