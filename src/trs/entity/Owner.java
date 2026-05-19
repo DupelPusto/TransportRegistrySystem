@@ -17,4 +17,12 @@ public class Owner {
     public void setPhone(String phone) {
         this.phone = phone;
     }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getFullName(){
+        return this.name + this.surname;
+    }
 }
