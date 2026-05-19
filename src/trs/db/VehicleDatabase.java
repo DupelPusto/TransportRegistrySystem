@@ -1,6 +1,7 @@
 package trs.db;
 
 import trs.entity.Vehicle;
+import trs.exception.DatabaseException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,14 +23,16 @@ public class VehicleDatabase {
     }
 
     public void addVehicle(Vehicle vehicle){
-
+        if (vehicleBase.containsKey(vehicle.getVinCode())) throw new DatabaseException("Транспортний засіб з таким VIN-вже зареєстрований!");
+        vehicleBase.put(vehicle.getVinCode(), vehicle);
     }
 
-    public void removeVehicle(String vinCode){
+    public Vehicle removeVehicle(String vinCode){
+        return vehicleBase.remove(vinCode);
 
     }
 
     public Vehicle findByVinCode(String vinCode){
-        return null;
+        return vehicleBase.get(vinCode);
     }
 }
