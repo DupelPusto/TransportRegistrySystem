@@ -22,7 +22,7 @@ public class OwnerDatabase {
         return instance;
     }
 
-    public void addOwner(Owner owner){
+    public void addOwner(Owner owner) throws DatabaseException{
 
         if (ownerBase.containsKey(owner.getPhone())) throw new DatabaseException("Власник з таким номером телефону вже існує!");
 
@@ -34,7 +34,7 @@ public class OwnerDatabase {
        return ownerBase.remove(phone);
     }
 
-    public void updatePhone(String current, String newPhone){
+    public void updatePhone(String current, String newPhone) throws DatabaseException{
 
         if (ownerBase.containsKey(newPhone)) throw new DatabaseException("Власник з таким номером телефону вже існує!");
 

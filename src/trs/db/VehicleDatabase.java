@@ -22,7 +22,7 @@ public class VehicleDatabase {
         return instance;
     }
 
-    public void addVehicle(Vehicle vehicle){
+    public void addVehicle(Vehicle vehicle) throws DatabaseException{
         if (vehicleBase.containsKey(vehicle.getVinCode())) throw new DatabaseException("Транспортний засіб з таким VIN-вже зареєстрований!");
         vehicleBase.put(vehicle.getVinCode(), vehicle);
     }
