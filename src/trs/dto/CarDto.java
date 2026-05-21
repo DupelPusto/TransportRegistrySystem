@@ -7,8 +7,8 @@ public class CarDto extends VehicleDto{
 
     private BodyType bodyType;
 
-    public CarDto(String vinCode, Owner owner) {
-        super(vinCode, owner);
+    public CarDto(String vinCode, String ownerPhone) {
+        super(vinCode, ownerPhone);
     }
 
     public void setBodyType(BodyType bodyType) {

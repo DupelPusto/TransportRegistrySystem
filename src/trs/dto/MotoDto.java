@@ -8,8 +8,8 @@ public class MotoDto extends VehicleDto{
     private boolean hasSidecar;
     private MotoType type;
 
-    public MotoDto(String vinCode, Owner owner) {
-        super(vinCode, owner);
+    public MotoDto(String vinCode, String ownerPhone) {
+        super(vinCode, ownerPhone);
     }
 
 
