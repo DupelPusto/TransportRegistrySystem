@@ -20,4 +20,12 @@ public enum MotoType {
     public String getDescription() {
         return description;
     }
+
+    public static String getTypes(){
+        StringBuilder types = new StringBuilder();
+        for (MotoType type : MotoType.values()){
+            types.append(type.ordinal()+1).append(" - ").append(type.getDescription()).append("\n");
+        }
+        return types.toString();
+    }
 }
