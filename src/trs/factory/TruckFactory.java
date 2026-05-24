@@ -15,7 +15,7 @@ public class TruckFactory implements VehicleFactory{
 
         return new Truck(
                 dto.getVinCode(), dto.getEngineCode(), dto.getColor(),
-                owner, dto.getLoadCapacity()
+                owner, dto.getModel(), dto.getLoadCapacity()
         );
     }
 }

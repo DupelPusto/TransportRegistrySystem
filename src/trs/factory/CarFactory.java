@@ -15,7 +15,7 @@ public class CarFactory implements VehicleFactory{
 
         return new Car(
                 dto.getVinCode(), dto.getEngineCode(), dto.getColor(),
-                owner, dto.getBodyType()
+                owner, dto.getModel(), dto.getBodyType()
         );
     }
 }

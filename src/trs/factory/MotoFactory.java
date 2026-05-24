@@ -15,7 +15,7 @@ public class MotoFactory implements VehicleFactory{
 
         return new Motorcycle(
                 dto.getVinCode(), dto.getEngineCode(), dto.getColor(),
-                owner, dto.isHasSidecar(), dto.getType()
+                owner, dto.getModel(), dto.isHasSidecar(), dto.getType()
         );
     }
 }
