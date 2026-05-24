@@ -6,8 +6,8 @@ public class TruckDto extends VehicleDto{
 
     private double loadCapacity;
 
-    public TruckDto(String vinCode, String ownerPhone) {
-        super(vinCode, ownerPhone);
+    public TruckDto(String vinCode, String model, String ownerPhone) {
+        super(vinCode, model, ownerPhone);
     }
 
     public void setLoadCapacity(double loadCapacity) {

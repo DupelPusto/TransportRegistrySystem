@@ -8,10 +8,12 @@ public class VehicleDto {
     private String engineCode;
     private String color;
     private String ownerPhone;
+    private String model;
 
-    public VehicleDto(String vinCode, String ownerPhone) {
+    public VehicleDto(String vinCode, String model,String ownerPhone) {
         this.vinCode = vinCode;
         this.ownerPhone = ownerPhone;
+        this.model = model;
     }
 
     public void setColor(String color) {
@@ -36,5 +38,9 @@ public class VehicleDto {
 
     public String getOwnerPhone() {
         return ownerPhone;
+    }
+
+    public String getModel() {
+        return model;
     }
 }
