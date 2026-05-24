@@ -5,8 +5,8 @@ public class Truck extends Vehicle{
     private double loadCapacity;
 
     public Truck(String vinCode, String engineCode, String color, Owner owner,
-                 double loadCapacity) {
-        super(vinCode, engineCode, color, owner);
+                 String model, double loadCapacity) {
+        super(vinCode, engineCode, color, owner, model);
         this.loadCapacity = loadCapacity;
     }
 }

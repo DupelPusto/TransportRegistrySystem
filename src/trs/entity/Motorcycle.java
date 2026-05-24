@@ -8,8 +8,8 @@ public class Motorcycle extends Vehicle{
     private MotoType type;
 
     public Motorcycle(String vinCode, String engineCode, String color, Owner owner,
-                      boolean hasSidecar, MotoType type) {
-        super(vinCode, engineCode, color, owner);
+                      String model, boolean hasSidecar, MotoType type) {
+        super(vinCode, engineCode, color, owner, model);
         this.hasSidecar = hasSidecar;
         this.type = type;
     }
