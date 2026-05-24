@@ -13,6 +13,7 @@ public class OwnerDatabase {
 
     private OwnerDatabase(){
         this.ownerBase = new HashMap<>();
+        ownerBase.put("380998887766", new Owner("qq", "ww", "380998887766", "email"));
     }
 
     public static OwnerDatabase getInstance(){
@@ -22,9 +23,7 @@ public class OwnerDatabase {
         return instance;
     }
 
-    public void addOwner(Owner owner) throws DatabaseException{
-
-        if (ownerBase.containsKey(owner.getPhone())) throw new DatabaseException("Власник з таким номером телефону вже існує!");
+    public void addOwner(Owner owner){
 
         ownerBase.put(owner.getPhone(), owner);
     }
