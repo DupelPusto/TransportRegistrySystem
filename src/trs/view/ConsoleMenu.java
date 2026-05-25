@@ -173,7 +173,7 @@ public class ConsoleMenu {
         int counter = 1;
         Map<String, String> toDoList = manager.getToDoList();
         for (String s : toDoList.values()){
-            System.out.printf("Потрібна дія: %s", s);
+            System.out.printf("%d Потрібна дія: %s%n", counter++, s);
         }
     }
 
