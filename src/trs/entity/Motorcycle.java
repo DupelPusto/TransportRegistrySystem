@@ -13,4 +13,14 @@ public class Motorcycle extends Vehicle{
         this.hasSidecar = hasSidecar;
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+
+        StringBuilder motoInfo = new StringBuilder(super.toString());
+        motoInfo.append("Бокова коляска: ").append(this.hasSidecar ? "є" : "відсутня").append("\n");
+        motoInfo.append("Тип: ").append(this.type.getDescription());
+
+        return motoInfo.toString();
+    }
 }

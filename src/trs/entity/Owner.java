@@ -22,7 +22,12 @@ public class Owner {
         return phone;
     }
 
-    public String getFullName(){
+    private String getFullName(){
         return this.name + " " + this.surname;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Повне ім'я: %s. Номер телефону: %s. Електронна пошта: %s", this.getFullName(), this.phone, this.email);
     }
 }

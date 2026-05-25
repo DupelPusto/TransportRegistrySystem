@@ -34,8 +34,8 @@ public abstract class Vehicle {
         this.history.add(new HistoryElement(LocalDateTime.now(), event, addInfo));
     }
 
-    public void updateStatus(VehicleStatus status){
-
+    public void updateStatus(VehicleStatus newStatus){
+        status = newStatus;
     }
 
     public void changeOwner(Owner owner){
@@ -52,5 +52,20 @@ public abstract class Vehicle {
 
     public String getModel() {
         return model;
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder info = new StringBuilder();
+
+        info.append("Транпортний засіб: ").append(this.model).append("\n");
+        info.append("VIN-код: ").append(this.vinCode).append("\n");
+        info.append("Код двигуна: ").append(this.engineCode).append("\n");
+        info.append("Колір: ").append(this.color).append("\n");
+        info.append("Номерний знак: ").append(this.govNumber == null ? "очікує на видачу" : this.govNumber).append("\n");
+        info.append("Власник: ").append(this.owner).append("\n");
+
+        return info.toString();
     }
 }

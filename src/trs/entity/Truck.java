@@ -9,4 +9,12 @@ public class Truck extends Vehicle{
         super(vinCode, engineCode, color, owner, model);
         this.loadCapacity = loadCapacity;
     }
+
+    @Override
+    public String toString() {
+
+        StringBuilder truckInfo = new StringBuilder(super.toString());
+        truckInfo.append("Вантажопідйомність: ").append(this.loadCapacity).append("\n");
+        return truckInfo.toString();
+    }
 }
