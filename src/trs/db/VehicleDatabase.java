@@ -37,11 +37,22 @@ public class VehicleDatabase {
         return vehicleBase.get(vinCode);
     }
 
+    public ArrayList<Vehicle> findAllByEngineCode(String engineCode){
+
+        ArrayList<Vehicle> temp = new ArrayList<>();
+        for (Vehicle veh : vehicleBase.values()){
+            if (engineCode.equals(veh.getEngineCode())){
+                temp.add(veh);
+            }
+        }
+        return temp;
+    }
+
     public ArrayList<Vehicle> findAllByGovNumber(String govNumber){
 
         ArrayList<Vehicle> temp = new ArrayList<>();
         for (Vehicle veh : vehicleBase.values()){
-            if (veh.getGovNumber().equals(govNumber)){
+            if (govNumber.equals(veh.getGovNumber())){
                 temp.add(veh);
             }
         }
@@ -52,7 +63,7 @@ public class VehicleDatabase {
 
         ArrayList<Vehicle> temp = new ArrayList<>();
         for (Vehicle veh : vehicleBase.values()){
-            if (veh.getOwner().getPhone().equals(phoneNumber)) temp.add(veh);
+            if (veh.getOwner() != null && veh.getOwner().getPhone().equals(phoneNumber)) temp.add(veh);
         }
         return temp;
     }
