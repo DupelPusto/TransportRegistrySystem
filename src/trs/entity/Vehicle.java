@@ -38,12 +38,28 @@ public abstract class Vehicle {
         status = newStatus;
     }
 
-    public void changeOwner(Owner owner){
+    public Owner getOwner(){
+        return this.owner;
+    }
 
+    public String getEngineCode(){
+        return this.engineCode;
+    }
+
+    public String getGovNumber(){
+        return this.govNumber;
     }
 
     public void assignGovNumber(String govNumber){
+        this.govNumber = govNumber;
+    }
 
+    public void setOwner(Owner owner){
+        this.owner = owner;
+    }
+
+    public VehicleStatus getStatus(){
+        return this.status;
     }
 
     public String getVinCode() {
