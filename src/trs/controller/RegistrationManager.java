@@ -88,7 +88,6 @@ public class RegistrationManager {
     }
 
     public void updateOwnerPhone(String current, String newPhone){
-
         ownerBase.updatePhone(current, newPhone);
     }
 
@@ -98,6 +97,7 @@ public class RegistrationManager {
         VehicleStatus oldStatus;
         for (Vehicle veh : temp){
             oldStatus = veh.getStatus();
+            veh.setOwner(null);
             veh.updateStatus(VehicleStatus.WITHOUT_OWNER);
             String addInfo = String.format("'%s' --> '%s'", oldStatus.getDescription(), VehicleStatus.WITHOUT_OWNER.getDescription());
             veh.addHistory(ActionEvent.STATUS_CHANGED, addInfo);
@@ -107,15 +107,16 @@ public class RegistrationManager {
         return ownerBase.removeOwner(phoneNum);
     }
 
-    public boolean isVehicleEngineCodeExists(String vinCode, String engineCode){
+    public boolean isVehicleEngineCodeExists(String engineCode){
 
-        return vehicleBase.findByVinCode(vinCode).getEngineCode().equals(engineCode);
+        ArrayList<Vehicle> temp = vehicleBase.findAllByEngineCode(engineCode);
+        return !temp.isEmpty();
     }
 
     public boolean isVehicleGovNumberExists(String govNumber){
 
         ArrayList<Vehicle> temp = vehicleBase.findAllByGovNumber(govNumber);
-        return temp == null;
+        return temp.isEmpty();
 
     }
 
@@ -125,10 +126,13 @@ public class RegistrationManager {
 
     public void updateVehicleOwner(String vin, String phoneNumber){
         vehicleBase.findByVinCode(vin).setOwner(ownerBase.findByPhone(phoneNumber));
+        toDoVehicles.remove(vin);
     }
 
     public Vehicle removeVehicle(String vinCode){
+        toDoVehicles.remove(vinCode);
         return vehicleBase.removeVehicle(vinCode);
+
     }
 
     public void assignGovNumberToVehicle(String vinCode, String govNumber){
@@ -139,6 +143,7 @@ public class RegistrationManager {
         VehicleStatus oldStatus = veh.getStatus();
         veh.updateStatus(VehicleStatus.NORMAL);
         veh.addHistory(ActionEvent.STATUS_CHANGED, String.format("%s --> %s", oldStatus.getDescription(), VehicleStatus.NORMAL.getDescription()));
+        toDoVehicles.remove(vinCode);
     }
 
     public void addUser(String login, String password, UserRole role) throws DatabaseException {
