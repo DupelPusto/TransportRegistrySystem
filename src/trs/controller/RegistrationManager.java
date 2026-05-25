@@ -20,10 +20,15 @@ import trs.factory.MotoFactory;
 import trs.factory.TruckFactory;
 import trs.factory.VehicleFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class RegistrationManager {
 
     private static RegistrationManager instance;
+    public static Map<String, String> toDoVehicles = new HashMap<>();
     private final VehicleDatabase vehicleBase = VehicleDatabase.getInstance();
     private final OwnerDatabase ownerBase = OwnerDatabase.getInstance();
     private final UserDatabase userBase = UserDatabase.getInstance();
@@ -61,34 +66,79 @@ public class RegistrationManager {
         vehicleBase.addVehicle(vehicle);
         vehicle.addHistory(ActionEvent.ADDED_TO_SYSTEM);
         vehicle.updateStatus(VehicleStatus.WAITING_FOR_REG_NUMBER);
+        toDoVehicles.put(vehicle.getVinCode(), String.format("%s(VIN - %s) очікує на видачу номерного знаку", vehicle.getModel(), vehicle.getVinCode()));
         vehicle.addHistory(ActionEvent.STATUS_CHANGED, String.format("--> %s", VehicleStatus.WAITING_FOR_REG_NUMBER.getDescription()));
 
         return vehicle;
 
     }
 
-    public void registerOwner(String name, String surname, String phone, String email){
-        ownerBase.addOwner(new Owner(name, surname, phone, email));
+    public Owner registerOwner(String name, String surname, String phone, String email){
+        Owner owner = new Owner(name, surname, phone, email);
+        ownerBase.addOwner(owner);
+        return owner;
     }
 
     public Owner findOwner(String phoneNum){
         return ownerBase.findByPhone(phoneNum);
     }
 
-    public boolean isOwnerRegistred(String phoneNum){
+    public boolean isOwnerRegistered(String phoneNum){
         return ownerBase.findByPhone(phoneNum) != null;
     }
 
     public void updateOwnerPhone(String current, String newPhone){
 
+        ownerBase.updatePhone(current, newPhone);
     }
 
-    public void removeOwner(String phoneNum){
+    public Owner removeOwner(String phoneNum){
+
+        ArrayList<Vehicle> temp = vehicleBase.findAllByOwnerNumber(phoneNum);
+        VehicleStatus oldStatus;
+        for (Vehicle veh : temp){
+            oldStatus = veh.getStatus();
+            veh.updateStatus(VehicleStatus.WITHOUT_OWNER);
+            String addInfo = String.format("'%s' --> '%s'", oldStatus.getDescription(), VehicleStatus.WITHOUT_OWNER.getDescription());
+            veh.addHistory(ActionEvent.STATUS_CHANGED, addInfo);
+            toDoVehicles.put(veh.getVinCode(), String.format("%s(VIN - %s) очікує переоформлення на нового власника", veh.getModel(), veh.getVinCode()));
+        }
+
+        return ownerBase.removeOwner(phoneNum);
+    }
+
+    public boolean isVehicleEngineCodeExists(String vinCode, String engineCode){
+
+        return vehicleBase.findByVinCode(vinCode).getEngineCode().equals(engineCode);
+    }
+
+    public boolean isVehicleGovNumberExists(String govNumber){
+
+        ArrayList<Vehicle> temp = vehicleBase.findAllByGovNumber(govNumber);
+        return temp == null;
 
     }
 
-    public void removeVehicle(String vinCode){
+    public boolean isVehicleRegistered(String vinCode){
+        return vehicleBase.findByVinCode(vinCode) != null;
+    }
 
+    public void updateVehicleOwner(String vin, String phoneNumber){
+        vehicleBase.findByVinCode(vin).setOwner(ownerBase.findByPhone(phoneNumber));
+    }
+
+    public Vehicle removeVehicle(String vinCode){
+        return vehicleBase.removeVehicle(vinCode);
+    }
+
+    public void assignGovNumberToVehicle(String vinCode, String govNumber){
+
+        Vehicle veh = vehicleBase.findByVinCode(vinCode);
+        veh.assignGovNumber(govNumber);
+        veh.addHistory(ActionEvent.ASSIGNED_REG_NUMBER, "--> " + govNumber);
+        VehicleStatus oldStatus = veh.getStatus();
+        veh.updateStatus(VehicleStatus.NORMAL);
+        veh.addHistory(ActionEvent.STATUS_CHANGED, String.format("%s --> %s", oldStatus.getDescription(), VehicleStatus.NORMAL.getDescription()));
     }
 
     public void addUser(String login, String password, UserRole role) throws DatabaseException {
@@ -103,5 +153,9 @@ public class RegistrationManager {
         return tempUser;
     }
 
+
+    public Map<String, String> getToDoList(){
+        return toDoVehicles;
+    }
 
 }
