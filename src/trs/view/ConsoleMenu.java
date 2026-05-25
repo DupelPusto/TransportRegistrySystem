@@ -10,6 +10,7 @@ import trs.entity.enums.MotoType;
 import trs.entity.user.User;
 import trs.entity.user.UserRole;
 import trs.exception.AuthorizationException;
+import trs.exception.DatabaseException;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -246,7 +247,13 @@ public class ConsoleMenu {
                 BodyType bodyType = BodyType.values()[body - 1];
                 carDto.setBodyType(bodyType);
 
-                vehicle = manager.registerVehicle(carDto);
+                try {
+                    vehicle = manager.registerVehicle(carDto);
+                } catch (DatabaseException e) {
+                    System.err.println(e.getMessage());
+                    break;
+                }
+
                 printInfo(vehicle);
                 break;
 
@@ -269,7 +276,13 @@ public class ConsoleMenu {
                 truckDto.setColor(color);
                 truckDto.setLoadCapacity(loadCap);
 
-                vehicle = manager.registerVehicle(truckDto);
+                try{
+                    vehicle = manager.registerVehicle(truckDto);
+                } catch (DatabaseException e) {
+                    System.err.println(e.getMessage());
+                    break;
+                }
+
                 printInfo(vehicle);
                 break;
 
@@ -317,7 +330,12 @@ public class ConsoleMenu {
                 motoDto.setColor(color);
                 motoDto.setType(MotoType.values()[motoType - 1]);
 
-                vehicle = manager.registerVehicle(motoDto);
+                try{
+                    vehicle = manager.registerVehicle(motoDto);
+                } catch (DatabaseException e) {
+                    System.err.println(e.getMessage());
+                    break;
+                }
                 printInfo(vehicle);
                 break;
 
