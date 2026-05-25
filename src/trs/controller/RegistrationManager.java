@@ -28,7 +28,7 @@ import java.util.Map;
 public class RegistrationManager {
 
     private static RegistrationManager instance;
-    public static Map<String, String> toDoVehicles = new HashMap<>();
+    private final Map<String, String> toDoVehicles = new HashMap<>();
     private final VehicleDatabase vehicleBase = VehicleDatabase.getInstance();
     private final OwnerDatabase ownerBase = OwnerDatabase.getInstance();
     private final UserDatabase userBase = UserDatabase.getInstance();
@@ -125,7 +125,12 @@ public class RegistrationManager {
     }
 
     public void updateVehicleOwner(String vin, String phoneNumber){
-        vehicleBase.findByVinCode(vin).setOwner(ownerBase.findByPhone(phoneNumber));
+        Vehicle veh = vehicleBase.findByVinCode(vin);
+        Owner oldOwner = veh.getOwner();
+        Owner newOwner = ownerBase.findByPhone(phoneNumber);
+        veh.setOwner(newOwner);
+        veh.addHistory(ActionEvent.OWNER_CHANGED, String.format("'%s' --> '%s'", oldOwner, newOwner));
+
         toDoVehicles.remove(vin);
     }
 
