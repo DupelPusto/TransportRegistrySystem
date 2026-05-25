@@ -4,6 +4,7 @@ import trs.controller.RegistrationManager;
 import trs.dto.CarDto;
 import trs.dto.MotoDto;
 import trs.dto.TruckDto;
+import trs.entity.Owner;
 import trs.entity.Vehicle;
 import trs.entity.enums.BodyType;
 import trs.entity.enums.MotoType;
@@ -12,8 +13,7 @@ import trs.entity.user.UserRole;
 import trs.exception.AuthorizationException;
 import trs.exception.DatabaseException;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.*;
 
 public class ConsoleMenu {
 
@@ -108,7 +108,9 @@ public class ConsoleMenu {
             System.out.println("3. Видалити власника");
             System.out.println("4. Зареєструвати ТЗ");
             System.out.println("5. Оновити власника ТЗ");
-            System.out.println("6. Поточні завдання");
+            System.out.println("6. Видалити ТЗ");
+            System.out.println("7. Видати номерний знак");
+            System.out.println("8. Поточні завдання");
             System.out.println("Введіть номер пункту меню або натисніть 0 для виходу з системи: ");
 
             int action;
@@ -122,7 +124,7 @@ public class ConsoleMenu {
                     case 0:
                         return;
                     case 1:
-                        registrateOwner();
+                        ownerRegistration();
                         break;
                     case 2:
                         updateOwnerNumber();
@@ -137,6 +139,14 @@ public class ConsoleMenu {
                         updateVehicleOwner();
                         break;
                     case 6:
+                        deleteVehicle();
+                        break;
+                    case 7:
+                        assignGovNumberToVehicle();
+                        break;
+                    case 8:
+                        printToDoList();
+                        break;
                     default:
                         throw new IllegalArgumentException("Неіснуючий пункт меню, спробуйте ще раз!");
                 }
@@ -152,28 +162,81 @@ public class ConsoleMenu {
     }
 
     void printInfo(Vehicle vehicle){
-        System.out.println("Успішно!\n" + vehicle);
+        System.out.println("Реєстрація успішна!\n" + vehicle);
     }
 
+    void printInfo(Owner owner){
+        System.out.println("Реєстрація успішна!\n" + owner);
+    }
 
-    void registrateOwner(){
+    void printToDoList(){
+        int counter = 1;
+        Map<String, String> toDoList = manager.getToDoList();
+        for (String s : toDoList.values()){
+            System.out.printf("Потрібна дія: %s", s);
+        }
+    }
 
+    void ownerRegistration(){
+
+        System.out.println("Реєстрація власника");
+        System.out.println("Введіть номер телефону: ");
+        String phone = scanner.nextLine().trim();
+        if (manager.isOwnerRegistered(phone)){
+            System.err.println("Власник з таким номером телефону вже зареєстрований!");
+            return;
+        }
+        System.out.println("Введіть ім'я: ");
+        String name = scanner.nextLine().trim();
+        System.out.println("Введіть прізвище: ");
+        String surname = scanner.nextLine().trim();
+        System.out.println("Введіть електронну пошту: ");
+        String email = scanner.nextLine().trim();
+
+        Owner owner = manager.registerOwner(name, surname, phone, email);
+        printInfo(owner);
 
     }
 
     void updateOwnerNumber(){
 
+        System.out.println("Оновлення номеру телефону власника");
+        System.out.println("Введіть зареєстрований номер телефону власника: ");
+        String current = scanner.nextLine().trim();
+        if (!manager.isOwnerRegistered(current)) {
+            System.err.println("Власника з вказаним номером телефону не знайдено!");
+            return;
+        }
+        System.out.println("Введіть новий номер телефону власника: ");
+        String newNumber = scanner.nextLine().trim();
+        if (manager.isOwnerRegistered(newNumber)) {
+            System.err.println("За вказаним новим номером телефону вже зареєстровано власника!");
+            return;
+        }
+
+        manager.updateOwnerPhone(current, newNumber);
+        System.out.println("Номер телефону власника успішно змінено!");
     }
 
     void deleteOwner(){
 
+        System.out.println("Видалення власника");
+        System.out.println("Введіть номер телефону власника для видалення: ");
+        String number = scanner.nextLine().trim();
+        if (!manager.isOwnerRegistered(number)){
+            System.err.println("Власника за вказаним номером телефону не знайдено!");
+            return;
+        }
+        Owner owner = manager.removeOwner(number);
+        System.out.printf("Власника %s успішно видалено!%n", owner);
     }
 
     void startVehicleRegistration(){
 
+        System.out.println("Реєстрація ТЗ");
         System.out.println("Введіть номер телефону власника: ");
-        String ownerPhone = scanner.nextLine();
-        if (!manager.isOwnerRegistred(ownerPhone)){
+        String ownerPhone = scanner.nextLine().trim();
+        if (!manager.isOwnerRegistered(ownerPhone)){
             System.err.println("Власника за вказаним номером не знайдено! Додайте власника та спробуйте знову");
             return;
         }
@@ -213,8 +276,16 @@ public class ConsoleMenu {
 
         System.out.println("Введіть VIN-код: ");
         vin = scanner.nextLine().trim();
+        if (manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортний засіб з таким VIN-кодом вже існує!");
+            return;
+        }
         System.out.println("Введіть код двигуна: ");
         engineCode = scanner.nextLine().trim();
+        if (manager.isVehicleEngineCodeExists(vin, engineCode)){
+            System.err.println("Транспортний засіб з таким двигуном вже зареєстрований!");
+            return;
+        }
         System.out.println("Введіть колір: ");
         color = scanner.nextLine().trim();
         System.out.println("Введіть марку та модель: ");
@@ -344,6 +415,55 @@ public class ConsoleMenu {
 
     void updateVehicleOwner(){
 
+        System.out.println("Зміна власника ТЗ");
+        System.out.println("Введіть VIN-код ТЗ: ");
+        String vin = scanner.nextLine().trim();
+        if (!manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортного засобу з таким VIN-кодом не знайдено!");
+            return;
+        }
+        System.out.println("Введіть номер телефону нового власника: ");
+        String phone = scanner.nextLine().trim();
+        if (!manager.isOwnerRegistered(phone)){
+            System.err.println("За вказаним номером власника не знайдено!");
+            return;
+        }
+        manager.updateVehicleOwner(vin, phone);
+        System.out.println("Власника ТЗ успішно змінено!");
+    }
+
+    void deleteVehicle(){
+
+        System.out.println("Видалення ТЗ");
+        System.out.println("Введіть VIN-код ТЗ: ");
+        String vin = scanner.nextLine().trim();
+        if (!manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортного засобу з таким VIN-кодом не існує!");
+            return;
+        }
+
+        Vehicle vehicle = manager.removeVehicle(vin);
+        System.out.printf("%s%nУспішно видалено!", vehicle);
+    }
+
+    void assignGovNumberToVehicle(){
+
+        System.out.println("Видача номерного знака");
+        System.out.println("Введіть VIN-код ТЗ: ");
+        String vin = scanner.nextLine();
+        if (!manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортний засіб з таким VIN-кодом не знайдено!");
+            return;
+        }
+        System.out.println("Введіть номерний знак для видачі: ");
+        String govNumber = scanner.nextLine().trim();
+        if (!manager.isVehicleGovNumberExists(govNumber)){
+            System.err.println("Номерний знак належить іншому ТЗ!");
+            return;
+        }
+        manager.assignGovNumberToVehicle(vin, govNumber);
+
+        System.out.println("Номерний знак видано!");
     }
 
 }
