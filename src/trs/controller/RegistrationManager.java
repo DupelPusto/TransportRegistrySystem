@@ -40,7 +40,7 @@ public class RegistrationManager {
         return instance;
     }
 
-    public Vehicle registerVehicle(VehicleDto dto){
+    public Vehicle registerVehicle(VehicleDto dto) throws DatabaseException{
 
         Vehicle vehicle = null;
         Owner owner = findOwner(dto.getOwnerPhone());
