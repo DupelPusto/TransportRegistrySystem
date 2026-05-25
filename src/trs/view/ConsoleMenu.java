@@ -282,7 +282,7 @@ public class ConsoleMenu {
         }
         System.out.println("Введіть код двигуна: ");
         engineCode = scanner.nextLine().trim();
-        if (manager.isVehicleEngineCodeExists(vin, engineCode)){
+        if (manager.isVehicleEngineCodeExists(engineCode)){
             System.err.println("Транспортний засіб з таким двигуном вже зареєстрований!");
             return;
         }
@@ -457,7 +457,7 @@ public class ConsoleMenu {
         }
         System.out.println("Введіть номерний знак для видачі: ");
         String govNumber = scanner.nextLine().trim();
-        if (!manager.isVehicleGovNumberExists(govNumber)){
+        if (manager.isVehicleGovNumberExists(govNumber)){
             System.err.println("Номерний знак належить іншому ТЗ!");
             return;
         }
