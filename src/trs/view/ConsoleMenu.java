@@ -4,7 +4,6 @@ import trs.controller.RegistrationManager;
 import trs.dto.CarDto;
 import trs.dto.MotoDto;
 import trs.dto.TruckDto;
-import trs.dto.VehicleDto;
 import trs.entity.Vehicle;
 import trs.entity.enums.BodyType;
 import trs.entity.enums.MotoType;
@@ -91,7 +90,7 @@ public class ConsoleMenu {
     public void adminMenu() {
 
         while (true) {
-            System.out.println("[АДМІНІСТРАТОР]СИСТЕМА ОРТЗ: ");
+            System.out.println("\n[АДМІНІСТРАТОР]СИСТЕМА ОРТЗ: ");
             System.out.println("1. Зареєструвати власника");
             System.out.println("2. Оновити номер власника");
             System.out.println("3. Видалити власника");
@@ -102,7 +101,7 @@ public class ConsoleMenu {
     public void userMenu() {
 
         while (true) {
-            System.out.println("СИСТЕМА ОРТЗ:");
+            System.out.println("\nСИСТЕМА ОРТЗ:");
             System.out.println("1. Зареєструвати власника");
             System.out.println("2. Оновити номер власника");
             System.out.println("3. Видалити власника");
@@ -131,7 +130,7 @@ public class ConsoleMenu {
                         deleteOwner();
                         break;
                     case 4:
-                        preregistrateVehicle();
+                        startVehicleRegistration();
                         break;
                     case 5:
                         updateVehicleOwner();
@@ -151,6 +150,10 @@ public class ConsoleMenu {
         }
     }
 
+    void printInfo(Vehicle vehicle){
+        System.out.println("Успішно!\n" + vehicle);
+    }
+
 
     void registrateOwner(){
 
@@ -165,7 +168,7 @@ public class ConsoleMenu {
 
     }
 
-    void preregistrateVehicle(){
+    void startVehicleRegistration(){
 
         System.out.println("Введіть номер телефону власника: ");
         String ownerPhone = scanner.nextLine();
@@ -187,7 +190,7 @@ public class ConsoleMenu {
                 case 2:
                 case 3:
                     scanner.nextLine();
-                    registrateVehicle(type, ownerPhone);
+                    vehicleRegistration(type, ownerPhone);
                     return;
                 default:
                     throw new IllegalArgumentException("Неіснуючий тип, спробуйте ще раз!");
@@ -199,8 +202,9 @@ public class ConsoleMenu {
         }
     }
 
-    void registrateVehicle(int type, String ownerPhone) {
+    void vehicleRegistration(int type, String ownerPhone) {
 
+        Vehicle vehicle;
         String vin;
         String engineCode;
         String color;
@@ -242,7 +246,8 @@ public class ConsoleMenu {
                 BodyType bodyType = BodyType.values()[body - 1];
                 carDto.setBodyType(bodyType);
 
-                manager.registerVehicle(carDto);
+                vehicle = manager.registerVehicle(carDto);
+                printInfo(vehicle);
                 break;
 
             case 2:
@@ -264,7 +269,8 @@ public class ConsoleMenu {
                 truckDto.setColor(color);
                 truckDto.setLoadCapacity(loadCap);
 
-                manager.registerVehicle(truckDto);
+                vehicle = manager.registerVehicle(truckDto);
+                printInfo(vehicle);
                 break;
 
             case 3:
@@ -293,8 +299,7 @@ public class ConsoleMenu {
                 String sidecar;
                 boolean hasSidecar;
                 while (true){
-                    sidecar = scanner.nextLine();
-                    scanner.nextLine();
+                    sidecar = scanner.nextLine().trim();
                     if (sidecar.equals("-")){
                         hasSidecar = false;
                         break;
@@ -303,7 +308,6 @@ public class ConsoleMenu {
                         break;
                     } else {
                         System.err.println("Невірний формат! Введіть - або +:");
-                        scanner.nextLine();
                     }
                 }
 
@@ -311,9 +315,10 @@ public class ConsoleMenu {
                 motoDto.setEngineCode(engineCode);
                 motoDto.setHasSidecar(hasSidecar);
                 motoDto.setColor(color);
-                motoDto.setType(MotoType.values()[motoType]);
+                motoDto.setType(MotoType.values()[motoType - 1]);
 
-                manager.registerVehicle(motoDto);
+                vehicle = manager.registerVehicle(motoDto);
+                printInfo(vehicle);
                 break;
 
         }
