@@ -3,6 +3,7 @@ package trs.db;
 import trs.entity.Vehicle;
 import trs.exception.DatabaseException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,5 +35,25 @@ public class VehicleDatabase {
 
     public Vehicle findByVinCode(String vinCode){
         return vehicleBase.get(vinCode);
+    }
+
+    public ArrayList<Vehicle> findAllByGovNumber(String govNumber){
+
+        ArrayList<Vehicle> temp = new ArrayList<>();
+        for (Vehicle veh : vehicleBase.values()){
+            if (veh.getGovNumber().equals(govNumber)){
+                temp.add(veh);
+            }
+        }
+        return temp;
+    }
+
+    public ArrayList<Vehicle> findAllByOwnerNumber(String phoneNumber){
+
+        ArrayList<Vehicle> temp = new ArrayList<>();
+        for (Vehicle veh : vehicleBase.values()){
+            if (veh.getOwner().getPhone().equals(phoneNumber)) temp.add(veh);
+        }
+        return temp;
     }
 }
