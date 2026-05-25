@@ -40,7 +40,7 @@ public class RegistrationManager {
         return instance;
     }
 
-    public void registerVehicle(VehicleDto dto){
+    public Vehicle registerVehicle(VehicleDto dto){
 
         Vehicle vehicle = null;
         Owner owner = findOwner(dto.getOwnerPhone());
@@ -58,11 +58,12 @@ public class RegistrationManager {
             factory = null;
         }
 
+        vehicleBase.addVehicle(vehicle);
         vehicle.addHistory(ActionEvent.ADDED_TO_SYSTEM);
         vehicle.updateStatus(VehicleStatus.WAITING_FOR_REG_NUMBER);
-        vehicle.addHistory(ActionEvent.STATUS_CHANGED);
+        vehicle.addHistory(ActionEvent.STATUS_CHANGED, String.format("--> %s", VehicleStatus.WAITING_FOR_REG_NUMBER.getDescription()));
 
-        System.out.println("Успішно!!!!!!! " + vehicle.getVinCode());
+        return vehicle;
 
     }
 
@@ -71,7 +72,7 @@ public class RegistrationManager {
     }
 
     public Owner findOwner(String phoneNum){
-        return null;
+        return ownerBase.findByPhone(phoneNum);
     }
 
     public boolean isOwnerRegistred(String phoneNum){
