@@ -33,14 +33,9 @@ public class OwnerDatabase {
        return ownerBase.remove(phone);
     }
 
-    public void updatePhone(String current, String newPhone) throws DatabaseException{
-
-        if (ownerBase.containsKey(newPhone)) throw new DatabaseException("Власник з таким номером телефону вже існує!");
+    public void updatePhone(String current, String newPhone) {
 
         Owner updatedOwner = ownerBase.remove(current);
-
-        if (updatedOwner == null) throw new DatabaseException("Власника з таким номером телефону не знайдено!");
-
         updatedOwner.setPhone(newPhone);
         ownerBase.put(newPhone, updatedOwner);
     }
