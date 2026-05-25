@@ -116,7 +116,7 @@ public class RegistrationManager {
     public boolean isVehicleGovNumberExists(String govNumber){
 
         ArrayList<Vehicle> temp = vehicleBase.findAllByGovNumber(govNumber);
-        return temp.isEmpty();
+        return !temp.isEmpty();
 
     }
 
