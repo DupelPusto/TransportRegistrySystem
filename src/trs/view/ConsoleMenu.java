@@ -1,6 +1,7 @@
 package trs.view;
 
 import trs.controller.RegistrationManager;
+import trs.controller.Validator;
 import trs.dto.CarDto;
 import trs.dto.MotoDto;
 import trs.dto.TruckDto;
@@ -18,7 +19,7 @@ import java.util.*;
 public class ConsoleMenu {
 
     private static Scanner scanner = new Scanner(System.in);
-    private static RegistrationManager manager = RegistrationManager.getInstance();
+    private static final RegistrationManager manager = RegistrationManager.getInstance();
     private static final String VEHICLE_TYPES = "1 - Легковий автомобіль\n" +
                                                 "2 - Вантажний автомобіль\n" +
                                                 "3 - Мотоцикл";
@@ -92,9 +93,13 @@ public class ConsoleMenu {
 
         while (true) {
             System.out.println("\n[АДМІНІСТРАТОР]СИСТЕМА ОРТЗ: ");
-            System.out.println("1. Зареєструвати власника");
-            System.out.println("2. Оновити номер власника");
-            System.out.println("3. Видалити власника");
+            System.out.println("1. Переглянути історію ТЗ");
+            System.out.println("2. Переглянути статистику");
+            System.out.println("3. Список ТЗ");
+            System.out.println("4. Додати інформацію про технічне обслуговування");
+            System.out.println("5. Додати інформацію про порушення");
+            System.out.println("6. Змінити статус");
+            System.out.println("7. Останні події");
             System.out.println("Введіть номер пункту меню або натисніть 0 для виходу з системи: ");
         }
     }
@@ -179,13 +184,19 @@ public class ConsoleMenu {
 
     void ownerRegistration(){
 
+        String phone;
         System.out.println("Реєстрація власника");
         System.out.println("Введіть номер телефону: ");
-        String phone = scanner.nextLine().trim();
+        phone = scanner.nextLine().trim();
+        if (!Validator.isPhoneNumberValid(phone)){
+            System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
+            return;
+        }
         if (manager.isOwnerRegistered(phone)){
             System.err.println("Власник з таким номером телефону вже зареєстрований!");
             return;
         }
+
         System.out.println("Введіть ім'я: ");
         String name = scanner.nextLine().trim();
         System.out.println("Введіть прізвище: ");
@@ -274,18 +285,29 @@ public class ConsoleMenu {
         String color;
         String model;
 
+
         System.out.println("Введіть VIN-код: ");
-        vin = scanner.nextLine().trim();
+        vin = scanner.nextLine().trim().toUpperCase();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
         if (manager.isVehicleRegistered(vin)){
             System.err.println("Транспортний засіб з таким VIN-кодом вже існує!");
             return;
         }
+
         System.out.println("Введіть код двигуна: ");
-        engineCode = scanner.nextLine().trim();
+        engineCode = scanner.nextLine().trim().toUpperCase();
+        if (!Validator.isEngineCodeValid(engineCode)){
+            System.err.println("Невірний формат коду двигуна! Введіть у форматі XXX1234X");
+            return;
+        }
         if (manager.isVehicleEngineCodeExists(engineCode)){
             System.err.println("Транспортний засіб з таким двигуном вже зареєстрований!");
             return;
         }
+
         System.out.println("Введіть колір: ");
         color = scanner.nextLine().trim();
         System.out.println("Введіть марку та модель: ");
