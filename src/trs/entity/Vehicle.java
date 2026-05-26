@@ -70,6 +70,10 @@ public abstract class Vehicle {
         return model;
     }
 
+    public List<HistoryElement> getHistory() {
+        return history;
+    }
+
     @Override
     public String toString() {
 
