@@ -323,13 +323,13 @@ public class ConsoleMenu {
 
         try{
             type = scanner.nextInt();
+            scanner.nextLine();
 
             switch (type){
 
                 case 1:
                 case 2:
                 case 3:
-                    scanner.nextLine();
                     vehicleRegistration(type, ownerPhone);
                     return;
                 default:
