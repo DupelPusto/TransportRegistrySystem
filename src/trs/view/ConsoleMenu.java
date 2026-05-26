@@ -5,6 +5,7 @@ import trs.controller.Validator;
 import trs.dto.CarDto;
 import trs.dto.MotoDto;
 import trs.dto.TruckDto;
+import trs.entity.HistoryElement;
 import trs.entity.Owner;
 import trs.entity.Vehicle;
 import trs.entity.enums.BodyType;
@@ -101,6 +102,54 @@ public class ConsoleMenu {
             System.out.println("6. Змінити статус");
             System.out.println("7. Останні події");
             System.out.println("Введіть номер пункту меню або натисніть 0 для виходу з системи: ");
+
+            int action;
+
+            try{
+                action = scanner.nextInt();
+                scanner.nextLine();
+
+                switch (action){
+
+                    case 0:
+                        return;
+                    case 1:
+                        printVehicleHistory();
+                        break;
+                    case 2:
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 6:
+                    case 7:
+                    default:
+                        throw new IllegalArgumentException("Неіснуючий пункт меню, спробуйте ще раз!");
+
+                }
+            } catch (InputMismatchException e){
+                System.err.println("Некоректне значення, введіть число!");
+                scanner.nextLine();
+            } catch (IllegalArgumentException e){
+                System.err.println(e.getMessage());
+            }
+        }
+    }
+
+    void printVehicleHistory(){
+
+        System.out.println("Введіть VIN-код: ");
+        String vin = scanner.nextLine().trim().toUpperCase();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
+        if (!manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортний засіб з таким VIN-кодом не знайдено!");
+            return;
+        }
+
+        for (HistoryElement el : manager.getVehicleHistory(vin)){
+            System.out.println(el);
         }
     }
 
@@ -214,12 +263,20 @@ public class ConsoleMenu {
         System.out.println("Оновлення номеру телефону власника");
         System.out.println("Введіть зареєстрований номер телефону власника: ");
         String current = scanner.nextLine().trim();
+        if (!Validator.isPhoneNumberValid(current)){
+            System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
+            return;
+        }
         if (!manager.isOwnerRegistered(current)) {
             System.err.println("Власника з вказаним номером телефону не знайдено!");
             return;
         }
         System.out.println("Введіть новий номер телефону власника: ");
         String newNumber = scanner.nextLine().trim();
+        if (!Validator.isPhoneNumberValid(newNumber)){
+            System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
+            return;
+        }
         if (manager.isOwnerRegistered(newNumber)) {
             System.err.println("За вказаним новим номером телефону вже зареєстровано власника!");
             return;
@@ -234,6 +291,10 @@ public class ConsoleMenu {
         System.out.println("Видалення власника");
         System.out.println("Введіть номер телефону власника для видалення: ");
         String number = scanner.nextLine().trim();
+        if (!Validator.isPhoneNumberValid(number)){
+            System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
+            return;
+        }
         if (!manager.isOwnerRegistered(number)){
             System.err.println("Власника за вказаним номером телефону не знайдено!");
             return;
@@ -247,6 +308,10 @@ public class ConsoleMenu {
         System.out.println("Реєстрація ТЗ");
         System.out.println("Введіть номер телефону власника: ");
         String ownerPhone = scanner.nextLine().trim();
+        if (!Validator.isPhoneNumberValid(ownerPhone)){
+            System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
+            return;
+        }
         if (!manager.isOwnerRegistered(ownerPhone)){
             System.err.println("Власника за вказаним номером не знайдено! Додайте власника та спробуйте знову");
             return;
@@ -440,12 +505,20 @@ public class ConsoleMenu {
         System.out.println("Зміна власника ТЗ");
         System.out.println("Введіть VIN-код ТЗ: ");
         String vin = scanner.nextLine().trim();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
         if (!manager.isVehicleRegistered(vin)){
             System.err.println("Транспортного засобу з таким VIN-кодом не знайдено!");
             return;
         }
         System.out.println("Введіть номер телефону нового власника: ");
         String phone = scanner.nextLine().trim();
+        if (!Validator.isPhoneNumberValid(phone)){
+            System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
+            return;
+        }
         if (!manager.isOwnerRegistered(phone)){
             System.err.println("За вказаним номером власника не знайдено!");
             return;
@@ -459,6 +532,10 @@ public class ConsoleMenu {
         System.out.println("Видалення ТЗ");
         System.out.println("Введіть VIN-код ТЗ: ");
         String vin = scanner.nextLine().trim();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
         if (!manager.isVehicleRegistered(vin)){
             System.err.println("Транспортного засобу з таким VIN-кодом не існує!");
             return;
@@ -473,6 +550,10 @@ public class ConsoleMenu {
         System.out.println("Видача номерного знака");
         System.out.println("Введіть VIN-код ТЗ: ");
         String vin = scanner.nextLine();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
         if (!manager.isVehicleRegistered(vin)){
             System.err.println("Транспортний засіб з таким VIN-кодом не знайдено!");
             return;
