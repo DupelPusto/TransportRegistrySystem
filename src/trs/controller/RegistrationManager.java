@@ -7,6 +7,7 @@ import trs.dto.CarDto;
 import trs.dto.MotoDto;
 import trs.dto.TruckDto;
 import trs.dto.VehicleDto;
+import trs.entity.HistoryElement;
 import trs.entity.Owner;
 import trs.entity.Vehicle;
 import trs.entity.enums.ActionEvent;
@@ -22,6 +23,7 @@ import trs.factory.VehicleFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -45,7 +47,7 @@ public class RegistrationManager {
         return instance;
     }
 
-    public Vehicle registerVehicle(VehicleDto dto) throws DatabaseException{
+    public Vehicle registerVehicle(VehicleDto dto){
 
         Vehicle vehicle = null;
         Owner owner = findOwner(dto.getOwnerPhone());
@@ -67,7 +69,7 @@ public class RegistrationManager {
         vehicle.addHistory(ActionEvent.ADDED_TO_SYSTEM);
         vehicle.updateStatus(VehicleStatus.WAITING_FOR_REG_NUMBER);
         toDoVehicles.put(vehicle.getVinCode(), String.format("%s(VIN - %s) очікує на видачу номерного знаку", vehicle.getModel(), vehicle.getVinCode()));
-        vehicle.addHistory(ActionEvent.STATUS_CHANGED, String.format("--> %s", VehicleStatus.WAITING_FOR_REG_NUMBER.getDescription()));
+        vehicle.addHistory(ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'",vehicle.getStatus().getDescription(), VehicleStatus.WAITING_FOR_REG_NUMBER.getDescription()));
 
         return vehicle;
 
@@ -144,10 +146,10 @@ public class RegistrationManager {
 
         Vehicle veh = vehicleBase.findByVinCode(vinCode);
         veh.assignGovNumber(govNumber);
-        veh.addHistory(ActionEvent.ASSIGNED_REG_NUMBER, "--> " + govNumber);
+        veh.addHistory(ActionEvent.ASSIGNED_REG_NUMBER, String.format("--> '%s'", govNumber));
         VehicleStatus oldStatus = veh.getStatus();
         veh.updateStatus(VehicleStatus.NORMAL);
-        veh.addHistory(ActionEvent.STATUS_CHANGED, String.format("%s --> %s", oldStatus.getDescription(), VehicleStatus.NORMAL.getDescription()));
+        veh.addHistory(ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'", oldStatus.getDescription(), VehicleStatus.NORMAL.getDescription()));
         toDoVehicles.remove(vinCode);
     }
 
@@ -163,9 +165,13 @@ public class RegistrationManager {
         return tempUser;
     }
 
-
     public Map<String, String> getToDoList(){
         return toDoVehicles;
+    }
+
+    public List<HistoryElement> getVehicleHistory(String vin){
+
+        return vehicleBase.findByVinCode(vin).getHistory();
     }
 
 }
