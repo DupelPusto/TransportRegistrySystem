@@ -131,7 +131,8 @@ public class RegistrationManager {
         Owner oldOwner = veh.getOwner();
         Owner newOwner = ownerBase.findByPhone(phoneNumber);
         veh.setOwner(newOwner);
-        veh.addHistory(ActionEvent.OWNER_CHANGED, String.format("'%s' --> '%s'", oldOwner, newOwner));
+        String oldOwnerName = (oldOwner != null) ? oldOwner.toString() : "Власник відсутній";
+        veh.addHistory(ActionEvent.OWNER_CHANGED, String.format("'%s' --> '%s'", oldOwnerName, newOwner));
 
         toDoVehicles.remove(vin);
     }
