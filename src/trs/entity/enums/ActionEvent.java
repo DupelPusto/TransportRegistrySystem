@@ -6,7 +6,12 @@ public enum ActionEvent {
     OWNER_CHANGED("Змінено власника транспортного засобу"),
     STATUS_CHANGED("Статус транспортного засобу змінено"),
     TECHNICAL_INSPECTION("Технічний огляд транспортного засобу"),
-    VIOLATION("Скоєно правопорушення");
+    VIOLATION("Скоєно правопорушення"),
+    OWNER_REGISTRATION("Зареєстровано нового власника"),
+    OWNER_DELETED("Видалено власника"),
+    VEHICLE_DELETED("Транспортний засіб видалено"),
+    OWNER_UPDATE_PHONE("Оновлено номер власника");
+
 
     private String description;
 
