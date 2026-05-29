@@ -20,11 +20,10 @@ import trs.factory.CarFactory;
 import trs.factory.MotoFactory;
 import trs.factory.TruckFactory;
 import trs.factory.VehicleFactory;
+import trs.statistic.Observer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 
 
 public class RegistrationManager {
@@ -34,6 +33,7 @@ public class RegistrationManager {
     private final VehicleDatabase vehicleBase = VehicleDatabase.getInstance();
     private final OwnerDatabase ownerBase = OwnerDatabase.getInstance();
     private final UserDatabase userBase = UserDatabase.getInstance();
+    private final List<Observer> subscribers = new ArrayList<>();
     private VehicleFactory factory;
 
 
@@ -66,10 +66,16 @@ public class RegistrationManager {
         }
 
         vehicleBase.addVehicle(vehicle);
-        vehicle.addHistory(ActionEvent.ADDED_TO_SYSTEM);
+        LocalDateTime timestamp1 = LocalDateTime.now();
+        vehicle.addHistory(timestamp1, ActionEvent.ADDED_TO_SYSTEM);
+        notifyObserves(timestamp1, ActionEvent.ADDED_TO_SYSTEM, vehicle.getVinCode(), vehicle.getModel());
+
         vehicle.updateStatus(VehicleStatus.WAITING_FOR_REG_NUMBER);
+        LocalDateTime timestamp2 = LocalDateTime.now();
+        vehicle.addHistory(timestamp2, ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'",vehicle.getStatus().getDescription(), VehicleStatus.WAITING_FOR_REG_NUMBER.getDescription()));
+        notifyObserves(timestamp2, ActionEvent.STATUS_CHANGED, vehicle.getVinCode(), vehicle.getModel());
+
         toDoVehicles.put(vehicle.getVinCode(), String.format("%s(VIN - %s) очікує на видачу номерного знаку", vehicle.getModel(), vehicle.getVinCode()));
-        vehicle.addHistory(ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'",vehicle.getStatus().getDescription(), VehicleStatus.WAITING_FOR_REG_NUMBER.getDescription()));
 
         return vehicle;
 
@@ -78,6 +84,8 @@ public class RegistrationManager {
     public Owner registerOwner(String name, String surname, String phone, String email){
         Owner owner = new Owner(name, surname, phone, email);
         ownerBase.addOwner(owner);
+        LocalDateTime timestamp = LocalDateTime.now();
+        notifyObserves(timestamp, ActionEvent.OWNER_REGISTRATION, owner.getPhone(), owner.getFullName());
         return owner;
     }
 
@@ -91,6 +99,8 @@ public class RegistrationManager {
 
     public void updateOwnerPhone(String current, String newPhone){
         ownerBase.updatePhone(current, newPhone);
+        LocalDateTime timestamp = LocalDateTime.now();
+        notifyObserves(timestamp, ActionEvent.OWNER_UPDATE_PHONE, current, newPhone);
     }
 
     public Owner removeOwner(String phoneNum){
@@ -100,13 +110,25 @@ public class RegistrationManager {
         for (Vehicle veh : temp){
             oldStatus = veh.getStatus();
             veh.setOwner(null);
+            LocalDateTime timestamp = LocalDateTime.now();
+
+            veh.addHistory(timestamp, ActionEvent.OWNER_CHANGED, "--> БЕЗ ВЛАСНИКА");
+            notifyObserves(timestamp, ActionEvent.OWNER_CHANGED, veh.getVinCode(), null);
+
             veh.updateStatus(VehicleStatus.WITHOUT_OWNER);
+            LocalDateTime timestamp1 = LocalDateTime.now();
             String addInfo = String.format("'%s' --> '%s'", oldStatus.getDescription(), VehicleStatus.WITHOUT_OWNER.getDescription());
-            veh.addHistory(ActionEvent.STATUS_CHANGED, addInfo);
+            veh.addHistory(timestamp1, ActionEvent.STATUS_CHANGED, addInfo);
+            notifyObserves(timestamp1, ActionEvent.STATUS_CHANGED, veh.getVinCode(), veh.getModel());
+
+
             toDoVehicles.put(veh.getVinCode(), String.format("%s(VIN - %s) очікує переоформлення на нового власника", veh.getModel(), veh.getVinCode()));
         }
 
-        return ownerBase.removeOwner(phoneNum);
+        Owner deletedOwner = ownerBase.removeOwner(phoneNum);
+        LocalDateTime timestamp2 = LocalDateTime.now();
+        notifyObserves(timestamp2, ActionEvent.OWNER_DELETED, deletedOwner.getPhone(), deletedOwner.getFullName());
+        return deletedOwner;
     }
 
     public boolean isVehicleEngineCodeExists(String engineCode){
@@ -131,27 +153,50 @@ public class RegistrationManager {
         Owner oldOwner = veh.getOwner();
         Owner newOwner = ownerBase.findByPhone(phoneNumber);
         veh.setOwner(newOwner);
+        LocalDateTime timestamp = LocalDateTime.now();
         String oldOwnerName = (oldOwner != null) ? oldOwner.toString() : "Власник відсутній";
-        veh.addHistory(ActionEvent.OWNER_CHANGED, String.format("'%s' --> '%s'", oldOwnerName, newOwner));
-
+        veh.addHistory(timestamp, ActionEvent.OWNER_CHANGED, String.format("'%s' --> '%s'", oldOwnerName, newOwner));
+        notifyObserves(timestamp, ActionEvent.OWNER_CHANGED, veh.getVinCode(), newOwner.getPhone());
         toDoVehicles.remove(vin);
     }
 
     public Vehicle removeVehicle(String vinCode){
         toDoVehicles.remove(vinCode);
-        return vehicleBase.removeVehicle(vinCode);
-
+        Vehicle veh = vehicleBase.removeVehicle(vinCode);
+        LocalDateTime timestamp = LocalDateTime.now();
+        notifyObserves(timestamp, ActionEvent.VEHICLE_DELETED, veh.getVinCode(), veh.getModel());
+        return veh;
     }
 
     public void assignGovNumberToVehicle(String vinCode, String govNumber){
 
         Vehicle veh = vehicleBase.findByVinCode(vinCode);
         veh.assignGovNumber(govNumber);
-        veh.addHistory(ActionEvent.ASSIGNED_REG_NUMBER, String.format("--> '%s'", govNumber));
+        LocalDateTime timestamp1 = LocalDateTime.now();
+        veh.addHistory(timestamp1, ActionEvent.ASSIGNED_REG_NUMBER, String.format("--> '%s'", govNumber));
+        notifyObserves(timestamp1, ActionEvent.ASSIGNED_REG_NUMBER, veh.getVinCode(), veh.getGovNumber());
         VehicleStatus oldStatus = veh.getStatus();
+
         veh.updateStatus(VehicleStatus.NORMAL);
-        veh.addHistory(ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'", oldStatus.getDescription(), VehicleStatus.NORMAL.getDescription()));
+        LocalDateTime timestamp2 = LocalDateTime.now();
+        veh.addHistory(timestamp2, ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'", oldStatus.getDescription(), VehicleStatus.NORMAL.getDescription()));
+        notifyObserves(timestamp2, ActionEvent.STATUS_CHANGED, veh.getVinCode(), veh.getModel());
+
         toDoVehicles.remove(vinCode);
+    }
+
+    public void addTechnicalInspection(String vinCode, String info){
+        Vehicle veh = vehicleBase.findByVinCode(vinCode);
+        LocalDateTime timestamp = LocalDateTime.now();
+        veh.addHistory(timestamp, ActionEvent.TECHNICAL_INSPECTION, String.format("--> '%s'", info));
+        notifyObserves(timestamp, ActionEvent.VIOLATION, veh.getVinCode(), info);
+    }
+
+    public void addViolation(String vinCode, String info){
+        Vehicle veh = vehicleBase.findByVinCode(vinCode);
+        LocalDateTime timestamp = LocalDateTime.now();
+        veh.addHistory(timestamp, ActionEvent.VIOLATION, String.format("--> '%s'", info));
+        notifyObserves(timestamp, ActionEvent.VIOLATION, veh.getVinCode(), info);
     }
 
     public void addUser(String login, String password, UserRole role) throws DatabaseException {
@@ -175,4 +220,13 @@ public class RegistrationManager {
         return vehicleBase.findByVinCode(vin).getHistory();
     }
 
+    public void notifyObserves(LocalDateTime timestamp, ActionEvent event, String id, String addInfo){
+        for (Observer sub : subscribers){
+            sub.onEvent(timestamp, event, id, addInfo);
+        }
+    }
+
+    public void addSubscriber(Observer sub){
+        subscribers.add(sub);
+    }
 }
