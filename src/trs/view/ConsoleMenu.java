@@ -14,6 +14,7 @@ import trs.entity.user.User;
 import trs.entity.user.UserRole;
 import trs.exception.AuthorizationException;
 import trs.exception.DatabaseException;
+import trs.statistic.AdminStatistic;
 
 import java.util.*;
 
@@ -21,9 +22,14 @@ public class ConsoleMenu {
 
     private static Scanner scanner = new Scanner(System.in);
     private static final RegistrationManager manager = RegistrationManager.getInstance();
+    private AdminStatistic statistic;
     private static final String VEHICLE_TYPES = "1 - Легковий автомобіль\n" +
                                                 "2 - Вантажний автомобіль\n" +
                                                 "3 - Мотоцикл";
+
+    public ConsoleMenu(AdminStatistic statistic) {
+        this.statistic = statistic;
+    }
 
     public void start(){
 
@@ -98,9 +104,9 @@ public class ConsoleMenu {
             System.out.println("2. Переглянути статистику");
             System.out.println("3. Список ТЗ");
             System.out.println("4. Додати інформацію про технічне обслуговування");
-            System.out.println("5. Додати інформацію про порушення");
+            System.out.println("5. Додати інформацію про правопорушення");
             System.out.println("6. Змінити статус");
-            System.out.println("7. Останні події");
+            System.out.println("7. Журнал подій");
             System.out.println("Введіть номер пункту меню або натисніть 0 для виходу з системи: ");
 
             int action;
@@ -117,11 +123,21 @@ public class ConsoleMenu {
                         printVehicleHistory();
                         break;
                     case 2:
+                        printStatistic();
+                        break;
                     case 3:
+                        break;
                     case 4:
+                        addTechnicalInspection();
+                        break;
                     case 5:
+                        addViolation();
+                        break;
                     case 6:
+                        break;
                     case 7:
+                        printLogJournal();
+                        break;
                     default:
                         throw new IllegalArgumentException("Неіснуючий пункт меню, спробуйте ще раз!");
 
@@ -151,6 +167,75 @@ public class ConsoleMenu {
         for (HistoryElement el : manager.getVehicleHistory(vin)){
             System.out.println(el);
         }
+    }
+
+    void printStatistic(){
+        System.out.println(statistic.getStatistic());
+    }
+
+    void printLogJournal(){
+        System.out.println("Журнал подій:");
+        for (String s : statistic.getLogJournal()){
+            System.out.println(s);
+        }
+    }
+
+    void addTechnicalInspection(){
+
+        System.out.println("Реєстрація технічного обслуговування");
+        System.out.println("Введіть VIN-код транспортного засобу: ");
+        String vin = scanner.nextLine().trim();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
+        if (!manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортний засіб з таким VIN-кодом не знайдено!");
+            return;
+        }
+
+        System.out.println("Введіть інформація про технічне обслуговування: ");
+        String info;
+        while (true){
+            info = scanner.nextLine().trim();
+            if (!info.isBlank()){
+                break;
+            }
+            System.out.println("Поле не може бути порожнім або містити тільки пробіли! Введіть інформацію спочатку: ");
+            scanner.nextLine();
+        }
+
+        manager.addTechnicalInspection(vin, info);
+        System.out.println("Інформацію про технічний огляд успішно зареєстровано!");
+    }
+
+    void addViolation(){
+
+        System.out.println("Реєстрація провопорушення");
+        System.out.println("Введіть VIN-код транспортного засобу: ");
+        String vin = scanner.nextLine().trim();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
+        if (!manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортний засіб з таким VIN-кодом не знайдено!");
+            return;
+        }
+
+        System.out.println("Введіть інформація про склад правопорушення: ");
+        String info;
+        while (true){
+            info = scanner.nextLine().trim();
+            if (!info.isBlank()){
+                break;
+            }
+            System.out.println("Поле не може бути порожнім або містити тільки пробіли! Введіть інформацію спочатку: ");
+            scanner.nextLine();
+        }
+
+        manager.addViolation(vin, info);
+        System.out.println("Інформацію про правопорушення успішно зареєстровано!");
     }
 
     public void userMenu() {
@@ -559,7 +644,13 @@ public class ConsoleMenu {
             return;
         }
         System.out.println("Введіть номерний знак для видачі: ");
-        String govNumber = scanner.nextLine().trim();
+        String govNumber;
+        while (true){
+            govNumber = scanner.nextLine().trim();
+            if (Validator.isGovNumberValid(govNumber)) break;
+            System.err.println("Невірний формат номерного знака! Введіть у форматі ХХ1234ХХ");
+            scanner.nextLine();
+        }
         if (manager.isVehicleGovNumberExists(govNumber)){
             System.err.println("Номерний знак належить іншому ТЗ!");
             return;
