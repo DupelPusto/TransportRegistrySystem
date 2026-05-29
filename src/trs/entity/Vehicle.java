@@ -26,12 +26,12 @@ public abstract class Vehicle {
         this.model = model;
     }
 
-    public void addHistory(ActionEvent event){
-        this.history.add(new HistoryElement(LocalDateTime.now(), event));
+    public void addHistory(LocalDateTime timestamp, ActionEvent event){
+        this.history.add(new HistoryElement(timestamp, event));
     }
 
-    public void addHistory(ActionEvent event, String addInfo){
-        this.history.add(new HistoryElement(LocalDateTime.now(), event, addInfo));
+    public void addHistory(LocalDateTime timestamp, ActionEvent event, String addInfo){
+        this.history.add(new HistoryElement(timestamp, event, addInfo));
     }
 
     public void updateStatus(VehicleStatus newStatus){
