@@ -36,7 +36,7 @@ public class AdminStatistic implements Observer{
                     String.format("[%s] Подія: Зареєстровано технічний огляд для ТЗ, VIN: %s --> %s", dateTime, id, addInfo);
             case OWNER_CHANGED ->
                 // date, vin, owner phone
-                    String.format("[%s] Подія: ЗмІна власника ТЗ, VIN: %s --> %s", dateTime, id, addInfo);
+                    String.format("[%s] Подія: Зміна власника ТЗ, VIN: %s --> %s", dateTime, id, addInfo);
             case OWNER_DELETED ->
                 // date, owner phone, owner full name
                     String.format("[%s] Подія: Власника ТЗ видалено, %s, %s", dateTime, id, addInfo);
