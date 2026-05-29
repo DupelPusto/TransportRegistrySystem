@@ -22,7 +22,7 @@ public class Owner {
         return phone;
     }
 
-    private String getFullName(){
+    public String getFullName(){
         return this.name + " " + this.surname;
     }
 
