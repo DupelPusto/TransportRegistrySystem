@@ -220,10 +220,28 @@ public class RegistrationManager {
         return vehicleBase.findByVinCode(vin).getHistory();
     }
 
+    public void changeVehicleStatus(String vin, VehicleStatus status){
+        Vehicle veh = vehicleBase.findByVinCode(vin);
+        VehicleStatus oldStatus = veh.getStatus();
+        veh.updateStatus(status);
+        LocalDateTime timestamp = LocalDateTime.now();
+        veh.addHistory(timestamp, ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'", oldStatus.getDescription(), status));
+        notifyObservers(timestamp, ActionEvent.STATUS_CHANGED, veh.getVinCode(), String.format("'%s' --> '%s'", oldStatus.getDescription(), status));
+
+    }
+
+    public boolean isVehicleWanted(String vin){
+        return vehicleBase.findByVinCode(vin).getStatus() == VehicleStatus.WANTED;
+    }
+
     public void notifyObservers(LocalDateTime timestamp, ActionEvent event, String id, String addInfo){
         for (Observer sub : subscribers){
             sub.onEvent(timestamp, event, id, addInfo);
         }
+    }
+
+    public List<Vehicle> getVehicles(){
+        return vehicleBase.getVehicles();
     }
 
     public void addSubscriber(Observer sub){
