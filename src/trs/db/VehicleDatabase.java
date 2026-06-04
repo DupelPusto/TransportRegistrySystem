@@ -5,6 +5,7 @@ import trs.exception.DatabaseException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class VehicleDatabase {
@@ -66,5 +67,9 @@ public class VehicleDatabase {
             if (veh.getOwner() != null && veh.getOwner().getPhone().equals(phoneNumber)) temp.add(veh);
         }
         return temp;
+    }
+
+    public List<Vehicle> getVehicles(){
+        return new ArrayList<>(vehicleBase.values());
     }
 }
