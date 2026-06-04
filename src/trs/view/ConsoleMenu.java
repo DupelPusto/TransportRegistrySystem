@@ -10,6 +10,7 @@ import trs.entity.Owner;
 import trs.entity.Vehicle;
 import trs.entity.enums.BodyType;
 import trs.entity.enums.MotoType;
+import trs.entity.enums.VehicleStatus;
 import trs.entity.user.User;
 import trs.entity.user.UserRole;
 import trs.exception.AuthorizationException;
@@ -105,7 +106,7 @@ public class ConsoleMenu {
             System.out.println("3. Список ТЗ");
             System.out.println("4. Додати інформацію про технічне обслуговування");
             System.out.println("5. Додати інформацію про правопорушення");
-            System.out.println("6. Змінити статус");
+            System.out.println("6. Подати/зняти з розшуку");
             System.out.println("7. Журнал подій");
             System.out.println("Введіть номер пункту меню або натисніть 0 для виходу з системи: ");
 
@@ -126,6 +127,7 @@ public class ConsoleMenu {
                         printStatistic();
                         break;
                     case 3:
+                        printVehicles();
                         break;
                     case 4:
                         addTechnicalInspection();
@@ -134,6 +136,7 @@ public class ConsoleMenu {
                         addViolation();
                         break;
                     case 6:
+                        changeVehicleStatus();
                         break;
                     case 7:
                         printLogJournal();
@@ -153,7 +156,7 @@ public class ConsoleMenu {
 
     void printVehicleHistory(){
 
-        System.out.println("Введіть VIN-код: ");
+        System.out.println("Введіть VIN-код(XXX12345XX): ");
         String vin = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
@@ -173,17 +176,19 @@ public class ConsoleMenu {
         System.out.println(statistic.getStatistic());
     }
 
-    void printLogJournal(){
-        System.out.println("Журнал подій:");
-        for (String s : statistic.getLogJournal()){
-            System.out.println(s);
+    void printVehicles(){
+
+        for (Vehicle veh : manager.getVehicles()){
+            String vehicle = String.format("ТЗ: %s, VIN: %s, Власник: %s(%s), Статус: %s ", veh.getModel(), veh.getVinCode(),
+                                            veh.getOwner().getFullName(), veh.getOwner().getPhone(), veh.getStatus().getDescription());
+            System.out.println(vehicle);
         }
     }
 
     void addTechnicalInspection(){
 
         System.out.println("Реєстрація технічного обслуговування");
-        System.out.println("Введіть VIN-код транспортного засобу: ");
+        System.out.println("Введіть VIN-код транспортного засобу(XXX12345XX): ");
         String vin = scanner.nextLine().trim();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
@@ -212,7 +217,7 @@ public class ConsoleMenu {
     void addViolation(){
 
         System.out.println("Реєстрація провопорушення");
-        System.out.println("Введіть VIN-код транспортного засобу: ");
+        System.out.println("Введіть VIN-код транспортного засобу(XXX12345XX): ");
         String vin = scanner.nextLine().trim();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
@@ -236,6 +241,63 @@ public class ConsoleMenu {
 
         manager.addViolation(vin, info);
         System.out.println("Інформацію про правопорушення успішно зареєстровано!");
+    }
+
+    void changeVehicleStatus(){
+
+        System.out.println("Зміна статусу ТЗ");
+        System.out.println("Введіть VIN-код транспортного засобу(XXX12345XX): ");
+        String vin = scanner.nextLine().trim().toUpperCase();
+        if (!Validator.isVinCodeValid(vin)){
+            System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
+            return;
+        }
+        if (!manager.isVehicleRegistered(vin)){
+            System.err.println("Транспортний засіб з таким VIN-кодом не знайдено!");
+            return;
+        }
+
+        System.out.println("Оберіть дію: ");
+        System.out.println("1. Подати у розшук");
+        System.out.println("2. Зняти з розшуку");
+        int action;
+
+        try {
+            action = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (action){
+
+                case 1:
+                    if (manager.isVehicleWanted(vin)) {
+                        System.err.println("Цей транспортний засіб вже знаходиться в розшуку!");
+                        return;
+                    }
+                    manager.changeVehicleStatus(vin, VehicleStatus.WANTED);
+                    break;
+                case 2:
+                    if (!manager.isVehicleWanted(vin)) {
+                        System.err.println("Цей транспортний засіб вже знято з розшуку!");
+                        return;
+                    }
+                    manager.changeVehicleStatus(vin, VehicleStatus.NORMAL);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Неіснуючий пункт меню, спробуйте ще раз!");
+            }
+        } catch (InputMismatchException e){
+            System.err.println("Некоректне значення, введіть число!");
+            scanner.nextLine();
+        } catch (IllegalArgumentException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    void printLogJournal(){
+        System.out.println("Журнал подій:");
+        for (String s : statistic.getLogJournal()){
+            System.out.println(s);
+        }
     }
 
     public void userMenu() {
@@ -320,7 +382,7 @@ public class ConsoleMenu {
 
         String phone;
         System.out.println("Реєстрація власника");
-        System.out.println("Введіть номер телефону: ");
+        System.out.println("Введіть номер телефону(380XXXXXXXXX): ");
         phone = scanner.nextLine().trim();
         if (!Validator.isPhoneNumberValid(phone)){
             System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
@@ -346,7 +408,7 @@ public class ConsoleMenu {
     void updateOwnerNumber(){
 
         System.out.println("Оновлення номеру телефону власника");
-        System.out.println("Введіть зареєстрований номер телефону власника: ");
+        System.out.println("Введіть зареєстрований номер телефону власника(380XXXXXXXXX): ");
         String current = scanner.nextLine().trim();
         if (!Validator.isPhoneNumberValid(current)){
             System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
@@ -374,7 +436,7 @@ public class ConsoleMenu {
     void deleteOwner(){
 
         System.out.println("Видалення власника");
-        System.out.println("Введіть номер телефону власника для видалення: ");
+        System.out.println("Введіть номер телефону власника для видалення(380XXXXXXXXX): ");
         String number = scanner.nextLine().trim();
         if (!Validator.isPhoneNumberValid(number)){
             System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
@@ -391,7 +453,7 @@ public class ConsoleMenu {
     void startVehicleRegistration(){
 
         System.out.println("Реєстрація ТЗ");
-        System.out.println("Введіть номер телефону власника: ");
+        System.out.println("Введіть номер телефону власника(380XXXXXXXXX): ");
         String ownerPhone = scanner.nextLine().trim();
         if (!Validator.isPhoneNumberValid(ownerPhone)){
             System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
@@ -436,7 +498,7 @@ public class ConsoleMenu {
         String model;
 
 
-        System.out.println("Введіть VIN-код: ");
+        System.out.println("Введіть VIN-код(XXX12345XX): ");
         vin = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
@@ -447,7 +509,7 @@ public class ConsoleMenu {
             return;
         }
 
-        System.out.println("Введіть код двигуна: ");
+        System.out.println("Введіть код двигуна(XXX1234X): ");
         engineCode = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isEngineCodeValid(engineCode)){
             System.err.println("Невірний формат коду двигуна! Введіть у форматі XXX1234X");
@@ -588,7 +650,7 @@ public class ConsoleMenu {
     void updateVehicleOwner(){
 
         System.out.println("Зміна власника ТЗ");
-        System.out.println("Введіть VIN-код ТЗ: ");
+        System.out.println("Введіть VIN-код ТЗ(XXX12345XX): ");
         String vin = scanner.nextLine().trim();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
@@ -598,7 +660,7 @@ public class ConsoleMenu {
             System.err.println("Транспортного засобу з таким VIN-кодом не знайдено!");
             return;
         }
-        System.out.println("Введіть номер телефону нового власника: ");
+        System.out.println("Введіть номер телефону нового власника(380XXXXXXXXX): ");
         String phone = scanner.nextLine().trim();
         if (!Validator.isPhoneNumberValid(phone)){
             System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
@@ -633,8 +695,8 @@ public class ConsoleMenu {
     void assignGovNumberToVehicle(){
 
         System.out.println("Видача номерного знака");
-        System.out.println("Введіть VIN-код ТЗ: ");
-        String vin = scanner.nextLine();
+        System.out.println("Введіть VIN-код ТЗ(XXX12345XX): ");
+        String vin = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
             return;
@@ -643,7 +705,7 @@ public class ConsoleMenu {
             System.err.println("Транспортний засіб з таким VIN-кодом не знайдено!");
             return;
         }
-        System.out.println("Введіть номерний знак для видачі: ");
+        System.out.println("Введіть номерний знак для видачі(XX1234XX): ");
         String govNumber;
         while (true){
             govNumber = scanner.nextLine().trim();
