@@ -113,7 +113,7 @@ public class RegistrationManager {
             LocalDateTime timestamp = LocalDateTime.now();
 
             veh.addHistory(timestamp, ActionEvent.OWNER_CHANGED, "--> БЕЗ ВЛАСНИКА");
-            notifyObservers(timestamp, ActionEvent.OWNER_CHANGED, veh.getVinCode(), null);
+            notifyObservers(timestamp, ActionEvent.OWNER_CHANGED, veh.getVinCode(), "БЕЗ ВЛАСНИКА");
 
             veh.updateStatus(VehicleStatus.WITHOUT_OWNER);
             LocalDateTime timestamp1 = LocalDateTime.now();
