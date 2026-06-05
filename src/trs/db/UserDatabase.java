@@ -1,5 +1,6 @@
 package trs.db;
 
+import trs.entity.Vehicle;
 import trs.entity.user.User;
 import trs.entity.user.UserRole;
 import trs.exception.DatabaseException;
@@ -34,4 +35,9 @@ public class UserDatabase {
     public User getUser(String login){
         return userBase.get(login);
     }
+
+    public Map<String, User> getBase() { return userBase; }
+
+    public void setBase(Map<String, User> userBase){ this.userBase = userBase; }
+
 }

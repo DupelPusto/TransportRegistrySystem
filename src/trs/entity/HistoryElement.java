@@ -2,10 +2,11 @@ package trs.entity;
 
 import trs.entity.enums.ActionEvent;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class HistoryElement {
+public class HistoryElement implements Serializable {
 
     private LocalDateTime date;
     private ActionEvent action;

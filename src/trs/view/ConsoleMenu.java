@@ -15,6 +15,8 @@ import trs.entity.user.User;
 import trs.entity.user.UserRole;
 import trs.exception.AuthorizationException;
 import trs.exception.DatabaseException;
+import trs.memento.FileCaretaker;
+import trs.memento.SystemOriginator;
 import trs.statistic.AdminStatistic;
 
 import java.util.*;
@@ -24,12 +26,16 @@ public class ConsoleMenu {
     private static Scanner scanner = new Scanner(System.in);
     private static final RegistrationManager manager = RegistrationManager.getInstance();
     private AdminStatistic statistic;
+    private final SystemOriginator originator;
+    private final FileCaretaker caretaker;
     private static final String VEHICLE_TYPES = "1 - Легковий автомобіль\n" +
                                                 "2 - Вантажний автомобіль\n" +
                                                 "3 - Мотоцикл";
 
-    public ConsoleMenu(AdminStatistic statistic) {
+    public ConsoleMenu(AdminStatistic statistic, SystemOriginator originator, FileCaretaker caretaker) {
         this.statistic = statistic;
+        this.originator = originator;
+        this.caretaker = caretaker;
     }
 
     public void start(){
@@ -52,6 +58,8 @@ public class ConsoleMenu {
                         authentication();
                         break;
                     case 2:
+                        caretaker.saveState(originator.createMemento());
+                        System.out.println("Дані збережено, вихід з системи...");
                         System.exit(0);
 
                     default:

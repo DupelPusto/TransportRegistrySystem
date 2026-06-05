@@ -1,7 +1,8 @@
 package trs.db;
 
 import trs.entity.Owner;
-import trs.exception.DatabaseException;
+import trs.entity.Vehicle;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +14,6 @@ public class OwnerDatabase {
 
     private OwnerDatabase(){
         this.ownerBase = new HashMap<>();
-        ownerBase.put("380998887766", new Owner("qq", "ww", "380998887766", "email"));
     }
 
     public static OwnerDatabase getInstance(){
@@ -43,5 +43,9 @@ public class OwnerDatabase {
     public Owner findByPhone(String phoneNum){
         return ownerBase.get(phoneNum);
     }
+
+    public Map<String, Owner> getBase() { return ownerBase; }
+
+    public void setBase(Map<String, Owner> ownerBase){ this.ownerBase = ownerBase; }
 
 }

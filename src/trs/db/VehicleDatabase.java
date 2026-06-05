@@ -72,4 +72,9 @@ public class VehicleDatabase {
     public List<Vehicle> getVehicles(){
         return new ArrayList<>(vehicleBase.values());
     }
+
+    public Map<String, Vehicle> getBase() { return vehicleBase; }
+
+    public void setBase(Map<String, Vehicle> vehicleBase){ this.vehicleBase = vehicleBase; }
+
 }

@@ -247,4 +247,9 @@ public class RegistrationManager {
     public void addSubscriber(Observer sub){
         subscribers.add(sub);
     }
+
+    public void setToDoVehicles(Map<String, String> toDoVehicles){
+        this.toDoVehicles.clear();
+        this.toDoVehicles.putAll(toDoVehicles);
+    }
 }

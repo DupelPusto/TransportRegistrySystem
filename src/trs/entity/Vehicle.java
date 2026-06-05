@@ -3,11 +3,12 @@ package trs.entity;
 import trs.entity.enums.ActionEvent;
 import trs.entity.enums.VehicleStatus;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Vehicle {
+public abstract class Vehicle implements Serializable {
 
     private String vinCode;
     private String engineCode;
