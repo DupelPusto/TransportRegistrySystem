@@ -421,7 +421,7 @@ public class ConsoleMenu {
 
         System.out.println("Оновлення номеру телефону власника");
         System.out.println("Введіть зареєстрований номер телефону власника(380XXXXXXXXX): ");
-        String current = scanner.nextLine().trim();
+        String current = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isPhoneNumberValid(current)){
             System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
             return;
@@ -449,7 +449,7 @@ public class ConsoleMenu {
 
         System.out.println("Видалення власника");
         System.out.println("Введіть номер телефону власника для видалення(380XXXXXXXXX): ");
-        String number = scanner.nextLine().trim();
+        String number = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isPhoneNumberValid(number)){
             System.err.println("Невірний формат номеру телефону! Введіть у форматі 380XXXXXXXXX");
             return;
