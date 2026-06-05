@@ -179,8 +179,12 @@ public class ConsoleMenu {
     void printVehicles(){
 
         for (Vehicle veh : manager.getVehicles()){
-            String vehicle = String.format("ТЗ: %s, VIN: %s, Власник: %s(%s), Статус: %s ", veh.getModel(), veh.getVinCode(),
-                                            veh.getOwner().getFullName(), veh.getOwner().getPhone(), veh.getStatus().getDescription());
+
+            String ownerInfo = (veh.getOwner() != null) ? String.format("%s(%s)", veh.getOwner().getFullName(),
+                    veh.getOwner().getPhone()) : "БЕЗ ВЛАСНИКА";
+
+            String vehicle = String.format("ТЗ: %s, VIN: %s, Власник: %s, Статус: %s ", veh.getModel(), veh.getVinCode(),
+                                            ownerInfo, veh.getStatus().getDescription());
             System.out.println(vehicle);
         }
     }
@@ -189,7 +193,7 @@ public class ConsoleMenu {
 
         System.out.println("Реєстрація технічного обслуговування");
         System.out.println("Введіть VIN-код транспортного засобу(XXX12345XX): ");
-        String vin = scanner.nextLine().trim();
+        String vin = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
             return;
@@ -218,7 +222,7 @@ public class ConsoleMenu {
 
         System.out.println("Реєстрація провопорушення");
         System.out.println("Введіть VIN-код транспортного засобу(XXX12345XX): ");
-        String vin = scanner.nextLine().trim();
+        String vin = scanner.nextLine().trim().toUpperCase();
         if (!Validator.isVinCodeValid(vin)){
             System.err.println("Невірний формат VIN-коду! Введіть у форматі XXX12345XX");
             return;
@@ -536,6 +540,7 @@ public class ConsoleMenu {
                         body = scanner.nextInt();
                         if (body < 1 || body > BodyType.values().length)
                             throw new IllegalArgumentException("Неіснуюче значення, спробуйте ще раз: ");
+                        scanner.nextLine();
                         break;
                     } catch (InputMismatchException e) {
                         System.err.println("Некоректне значення, введіть число: ");
@@ -569,6 +574,7 @@ public class ConsoleMenu {
                 while (true){
                     try{
                         loadCap = scanner.nextDouble();
+                        scanner.nextLine();
                         break;
                     } catch (InputMismatchException e){
                         System.err.println("Некоректне значення, введіть число:");
