@@ -12,7 +12,6 @@ public class MotoDto extends VehicleDto{
         super(vinCode, model, ownerPhone);
     }
 
-
     public void setHasSidecar(boolean hasSidecar) {
         this.hasSidecar = hasSidecar;
     }

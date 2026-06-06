@@ -78,7 +78,9 @@ public class AdminStatistic implements Observer{
     }
 
     public Map<ActionEvent, Integer> getCounters() { return counters; }
+
     public void setCounters(Map<ActionEvent, Integer> counters) { this.counters = counters; }
+
     public void setLogs(List<String> logs) { this.logs = logs; }
 
 }

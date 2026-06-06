@@ -105,6 +105,7 @@ public class ConsoleMenu {
 
     }
 
+
     public void adminMenu() {
 
         while (true) {
@@ -312,6 +313,7 @@ public class ConsoleMenu {
         }
     }
 
+
     public void userMenu() {
 
         while (true) {
@@ -371,22 +373,6 @@ public class ConsoleMenu {
             } catch (IllegalArgumentException e){
                 System.err.println(e.getMessage());
             }
-        }
-    }
-
-    void printInfo(Vehicle vehicle){
-        System.out.println("Реєстрація успішна!\n" + vehicle);
-    }
-
-    void printInfo(Owner owner){
-        System.out.println("Реєстрація успішна!\n" + owner);
-    }
-
-    void printToDoList(){
-        int counter = 1;
-        Map<String, String> toDoList = manager.getToDoList();
-        for (String s : toDoList.values()){
-            System.out.printf("%d Потрібна дія: %s%n", counter++, s);
         }
     }
 
@@ -734,6 +720,23 @@ public class ConsoleMenu {
         manager.assignGovNumberToVehicle(vin, govNumber);
 
         System.out.println("Номерний знак видано!");
+    }
+
+    void printToDoList(){
+        int counter = 1;
+        Map<String, String> toDoList = manager.getToDoList();
+        for (String s : toDoList.values()){
+            System.out.printf("%d Потрібна дія: %s%n", counter++, s);
+        }
+    }
+
+
+    void printInfo(Vehicle vehicle){
+        System.out.println("Реєстрація успішна!\n" + vehicle);
+    }
+
+    void printInfo(Owner owner){
+        System.out.println("Реєстрація успішна!\n" + owner);
     }
 
 }

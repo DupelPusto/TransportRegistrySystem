@@ -30,9 +30,14 @@ public class SystemMemento implements Serializable {
     }
 
     public Map<String, Vehicle> getVehicles() { return vehicles; }
+
     public Map<String, Owner> getOwners() { return owners; }
+
     public Map<String, User> getUsers() { return users; }
+
     public Map<String, String> getToDoList() { return toDoList; }
+
     public Map<ActionEvent, Integer> getCounters() { return counters; }
+
     public List<String> getLogs() { return logs; }
 }
