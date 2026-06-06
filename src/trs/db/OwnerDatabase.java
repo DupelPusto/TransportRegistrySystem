@@ -1,8 +1,6 @@
 package trs.db;
 
 import trs.entity.Owner;
-import trs.entity.Vehicle;
-
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package trs.dto;
 
-import trs.entity.Owner;
+
 import trs.entity.enums.MotoType;
 
 public class MotoDto extends VehicleDto{
