@@ -153,10 +153,15 @@ public class RegistrationManager {
         Owner oldOwner = veh.getOwner();
         Owner newOwner = ownerBase.findByPhone(phoneNumber);
         veh.setOwner(newOwner);
+        VehicleStatus oldStatus = veh.getStatus();
+        veh.updateStatus(VehicleStatus.NORMAL);
         LocalDateTime timestamp = LocalDateTime.now();
         String oldOwnerName = (oldOwner != null) ? oldOwner.toString() : "Власник відсутній";
         veh.addHistory(timestamp, ActionEvent.OWNER_CHANGED, String.format("'%s' --> '%s'", oldOwnerName, newOwner));
         notifyObservers(timestamp, ActionEvent.OWNER_CHANGED, veh.getVinCode(), newOwner.getPhone());
+
+        veh.addHistory(timestamp, ActionEvent.STATUS_CHANGED, String.format("'%s' --> '%s'", oldStatus.getDescription(), veh.getStatus().getDescription()));
+        notifyObservers(timestamp, ActionEvent.STATUS_CHANGED, veh.getVinCode(), String.format("'%s' --> '%s'", oldStatus.getDescription(), veh.getStatus().getDescription()));
         toDoVehicles.remove(vin);
     }
 
